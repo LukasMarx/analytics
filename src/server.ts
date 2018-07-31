@@ -18,7 +18,7 @@ mongo.MongoClient.connect(
     try {
       cachedDb.createCollection('logs', { capped: true, size: 1073741824 });
     } catch (error) {}
-    cachedDb.collection('logs').createIndex({ projectId: 1, path: 1 }, { background: true, unique: true });
+    cachedDb.collection('logs').createIndex({ projectId: 1 }, { background: true, unique: false });
   })
   .catch();
 
