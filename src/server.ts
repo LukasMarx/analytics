@@ -34,7 +34,7 @@ io.on('connection', function(socket) {
     io.to('realtime').emit('pageview', dataset);
     cachedDb.collection('logs').insert(dataset);
   });
-  socket.on('listen', socket => {
+  socket.on('listen', () => {
     socket.join('realtime');
   });
 });
