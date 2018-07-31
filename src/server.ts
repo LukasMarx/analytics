@@ -25,7 +25,7 @@ mongo.MongoClient.connect(
 const app = express();
 app.use(cors());
 const httpServer = (<any>http).Server(app);
-const io = socketIO(httpServer, { path: '/analytics' });
+const io = socketIO(httpServer, { path: '/analytics', origins: '*:*' });
 
 io.on('connection', function(socket) {
   socket.on('navigation', msg => {
