@@ -5,7 +5,7 @@ import * as mongo from 'mongodb';
 
 const uri = process.env.MONGODB;
 
-let cachedDb: mongo.Db = null;
+let cachedDb: mongo.Db = undefined;
 
 mongo.MongoClient.connect(
   uri,
