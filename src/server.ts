@@ -13,7 +13,10 @@ mongo.MongoClient.connect(
 )
   .then(async client => {
     cachedDb = client.db('analytics');
-    cachedDb.createCollection('logs', { capped: true, size: 1073741824 });
+    const result = await cachedDb.command({ listCollections: 1 });
+    try {
+      cachedDb.createCollection('logs', { capped: true, size: 1073741824 });
+    } catch (error) {}
     cachedDb.collection('logs').createIndex({ projectId: 1, path: 1 }, { background: true, unique: true });
   })
   .catch();
