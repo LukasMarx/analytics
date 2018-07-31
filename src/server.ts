@@ -1,6 +1,7 @@
 import express from 'express';
 import http from 'http';
 import socketIO from 'socket.io';
+import cors from 'cors';
 import * as mongo from 'mongodb';
 
 const uri = process.env.MONGODB;
@@ -22,6 +23,7 @@ mongo.MongoClient.connect(
   .catch();
 
 const app = express();
+app.use(cors());
 const httpServer = (<any>http).Server(app);
 const io = socketIO(httpServer);
 
