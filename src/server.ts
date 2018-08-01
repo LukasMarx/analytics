@@ -31,7 +31,14 @@ const io = socketIO(httpServer, { path: '/analytics', origins: '*:*', cookie: fa
 const userCount = new Subject<number>();
 
 io.on('connection', function(socket) {
-  console.log(socket.conn.transport.socket._socket.remoteAddress);
+  console.log(socket.client.request.headers['x-forwarded-for']);
+
+  console.log(socket.handshake.address);
+
+  console.log(socket.handshake.headers('x-forwarded-for'));
+
+  console.log(socket.handshake.headers['x-real-ip']);
+
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     cachedDb.collection('logs').insert(dataset);
