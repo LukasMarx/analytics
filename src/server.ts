@@ -61,7 +61,11 @@ io.on('connection', function(socket) {
         }
       }
       console.log(clients.filter(n => n != null).length, c.length);
+      socket.disconnect(true);
     });
+  });
+  socket.on('error', function(err) {
+    console.log('socket error: ' + err);
   });
 });
 
