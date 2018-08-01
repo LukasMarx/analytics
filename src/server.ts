@@ -36,6 +36,7 @@ io.on('connection', function(socket) {
     cachedDb.collection('logs').insert(dataset);
   });
   socket.on('connect', () => {
+    console.log(io.nsps['/'].connected);
     userCount.next(Object.keys(io.nsps['/'].connected).length);
   });
   socket.on('disconnect', () => {
