@@ -43,38 +43,18 @@ io.on('connection', function(socket) {
 
   console.log('connected ' + socket.id);
   counter++;
-  io.clients((error: Error, clients: any[]) => {
-    userCount.next(clients.filter(n => n).length);
+  console.log(counter + ' active connections');
 
-    const c = [];
-    const s = io.of('/').sockets;
-    for (const key in s) {
-      if (s[key] && s[key].connected) {
-        c.push(s[key]);
-      }
-    }
-    console.log(clients.filter(n => n).length, c.length, counter);
-  });
-  socket.on('disconnect', () => {
+  socket.once('disconnect', () => {
     console.log('disconnected ' + socket.id);
     counter--;
+    console.log(counter + ' active connections');
     delete whoSeesWhat[socket.id];
-    io.clients((error: Error, clients: any[]) => {
-      userCount.next(clients.filter(n => n).length);
-
-      const c = [];
-      const s = io.of('/').sockets;
-      for (const key in s) {
-        if (s[key]) {
-          c.push(s[key]);
-        }
-      }
-      console.log(clients.filter(n => n != null).length, c.length, counter);
-      socket.disconnect(true);
-    });
+    socket.disconnect(true);
   });
   socket.on('error', function(err) {
     console.log('socket error: ' + err);
+    socket.disconnect(true);
   });
 });
 
@@ -89,5 +69,5 @@ io.of('/admin').on('connection', function(socket) {
 });
 
 httpServer.listen(3000, function() {
-  console.log('listening on *:4222');
+  console.log('listening on *:3000');
 });
