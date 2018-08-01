@@ -29,11 +29,15 @@ const httpServer = (<any>http).Server(app);
 const io = socketIO(httpServer, { path: '/analytics', origins: '*:*', cookie: false, transports: ['websocket'] });
 
 const userCount = new Subject<number>();
+const currentlyReading = new Subject<{ path: string; socketId: string }>();
+const whoSeesWhat: { [key: string]: string } = {};
 
 let counter = 0;
 io.on('connection', function(socket) {
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
+    whoSeesWhat[socket.id] = msg.path;
+    currentlyReading.next({ path: (<any>msg).path, socketId: socket.id });
     cachedDb.collection('logs').insert(dataset);
   });
 
@@ -77,8 +81,12 @@ io.of('/admin').on('connection', function(socket) {
   const sub = userCount.subscribe(count => {
     socket.emit('usercount', count);
   });
+  const sub1 = currentlyReading.subscribe(reader => {
+    socket.emit('reading', whoSeesWhat);
+  });
   socket.on('disconnect', () => {
     sub.unsubscribe();
+    sub1.unsubscribe();
   });
 });
 
