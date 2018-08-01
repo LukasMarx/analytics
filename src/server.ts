@@ -31,19 +31,18 @@ const io = socketIO(httpServer, { path: '/analytics', origins: '*:*', cookie: fa
 const userCount = new Subject<number>();
 
 io.on('connection', function(socket) {
+  console.log(socket.request.connection.remoteAddress);
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     cachedDb.collection('logs').insert(dataset);
   });
   socket.on('connect', () => {
     io.clients((error: Error, clients: any[]) => {
-      console.log(clients);
       userCount.next(clients.filter(n => n).length);
     });
   });
   socket.on('disconnect', () => {
     io.clients((error: Error, clients: any[]) => {
-      console.log(clients);
       userCount.next(clients.filter(n => n).length);
     });
   });
