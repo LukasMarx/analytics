@@ -30,19 +30,19 @@ const io = socketIO(httpServer, { path: '/analytics', origins: '*:*' });
 
 const userCount = new Subject<number>();
 
-const sockets: { [key: string]: Socket } = {};
+let counter = 0;
 io.on('connection', function(socket) {
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     cachedDb.collection('logs').insert(dataset);
   });
   socket.on('connect', () => {
-    sockets[socket.id] = socket;
-    userCount.next(Object.keys(sockets).length);
+    counter++;
+    userCount.next(counter);
   });
   socket.on('disconnect', () => {
-    delete sockets[socket.id];
-    userCount.next(Object.keys(sockets).length);
+    counter--;
+    userCount.next(counter);
   });
 });
 
