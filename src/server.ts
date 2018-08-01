@@ -37,11 +37,13 @@ io.on('connection', function(socket) {
   });
   socket.on('connect', () => {
     io.clients((error: Error, clients: any[]) => {
+      console.log(clients);
       userCount.next(clients.filter(n => n).length);
     });
   });
   socket.on('disconnect', () => {
     io.clients((error: Error, clients: any[]) => {
+      console.log(clients);
       userCount.next(clients.filter(n => n).length);
     });
   });
