@@ -1,8 +1,9 @@
 import express from 'express';
 import http from 'http';
-import socketIO from 'socket.io';
+import socketIO, { Socket } from 'socket.io';
 import cors from 'cors';
 import * as mongo from 'mongodb';
+import { Subject } from 'rxjs';
 
 const uri = process.env.MONGODB;
 
@@ -27,23 +28,29 @@ app.use(cors());
 const httpServer = (<any>http).Server(app);
 const io = socketIO(httpServer, { path: '/analytics', origins: '*:*' });
 
-let counter = 0;
+const userCount = new Subject<number>();
+
+let sockets: { [key: string]: Socket } = {};
 io.on('connection', function(socket) {
-  counter++;
-  io.to('realtime').emit('usercount', counter);
+  sockets[socket.id] = socket;
+  userCount.next(Object.keys(sockets).length);
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     io.to('realtime').emit('pageview', dataset);
     cachedDb.collection('logs').insert(dataset);
   });
   socket.on('disconnect', () => {
-    counter--;
-    io.to('realtime').emit('usercount', counter);
+    delete sockets[socket.id];
+    userCount.next(Object.keys(sockets).length);
   });
-  socket.on('listen', () => {
-    counter--;
-    io.to('realtime').emit('usercount', counter);
-    socket.join('realtime');
+});
+
+io.of('/admin').on('connection', function(socket) {
+  const sub = userCount.subscribe(count => {
+    socket.emit('usercount', count);
+  });
+  socket.on('disconnect', () => {
+    sub.unsubscribe();
   });
 });
 
