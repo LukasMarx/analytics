@@ -35,7 +35,7 @@ io.on('connection', function(socket) {
 
   console.log(socket.handshake.address);
 
-  console.log(socket.handshake.headers('x-forwarded-for'));
+  console.log(socket.handshake.headers['x-forwarded-for']);
 
   console.log(socket.handshake.headers['x-real-ip']);
 
