@@ -50,7 +50,6 @@ io.on('connection', function(socket) {
       }
     }
     console.log(clients.filter(n => n).length, c.length, counter);
-    socket.disconnect(true);
   });
   socket.on('disconnect', () => {
     console.log('disconnected ' + socket.id);
