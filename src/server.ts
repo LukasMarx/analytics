@@ -55,12 +55,12 @@ io.on('connection', function(socket) {
 
       const c = [];
       const s = io.of('/').sockets;
-      for (let key in s) {
+      for (const key in s) {
         if (s[key]) {
           c.push(s[key]);
         }
       }
-      console.log(clients.filter(n => n).length, c.length);
+      console.log(clients.filter(n => n != null).length, c.length);
     });
   });
 });
