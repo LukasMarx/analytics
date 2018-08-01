@@ -31,10 +31,6 @@ const io = socketIO(httpServer, { path: '/analytics', origins: '*:*', cookie: fa
 const userCount = new Subject<number>();
 
 io.on('connection', function(socket) {
-  console.log(socket.client.request);
-
-  console.log(socket.handshake);
-
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     cachedDb.collection('logs').insert(dataset);
@@ -42,11 +38,29 @@ io.on('connection', function(socket) {
   socket.on('connect', () => {
     io.clients((error: Error, clients: any[]) => {
       userCount.next(clients.filter(n => n).length);
+
+      const c = [];
+      const s = io.of('/').sockets;
+      for (let key in s) {
+        if (s[key]) {
+          c.push(s[key]);
+        }
+      }
+      console.log(clients.filter(n => n).length, c.length);
     });
   });
   socket.on('disconnect', () => {
     io.clients((error: Error, clients: any[]) => {
       userCount.next(clients.filter(n => n).length);
+
+      const c = [];
+      const s = io.of('/').sockets;
+      for (let key in s) {
+        if (s[key]) {
+          c.push(s[key]);
+        }
+      }
+      console.log(clients.filter(n => n).length, c.length);
     });
   });
 });
