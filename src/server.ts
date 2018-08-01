@@ -27,14 +27,22 @@ app.use(cors());
 const httpServer = (<any>http).Server(app);
 const io = socketIO(httpServer, { path: '/analytics', origins: '*:*' });
 
+let counter = 0;
 io.on('connection', function(socket) {
+  counter++;
+  io.to('realtime').emit('usercount', counter);
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
-    console.log(dataset);
     io.to('realtime').emit('pageview', dataset);
     cachedDb.collection('logs').insert(dataset);
   });
+  socket.on('disconnect', () => {
+    counter--;
+    io.to('realtime').emit('usercount', counter);
+  });
   socket.on('listen', () => {
+    counter--;
+    io.to('realtime').emit('usercount', counter);
     socket.join('realtime');
   });
 });
