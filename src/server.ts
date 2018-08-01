@@ -26,7 +26,7 @@ mongo.MongoClient.connect(
 const app = express();
 app.use(cors());
 const httpServer = (<any>http).Server(app);
-const io = socketIO(httpServer, { path: '/analytics', origins: '*:*', cookie: false });
+const io = socketIO(httpServer, { path: '/analytics', origins: '*:*', cookie: false, transports: ['websocket'] });
 
 const userCount = new Subject<number>();
 
