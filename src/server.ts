@@ -58,6 +58,7 @@ io.on('connection', function(socket) {
   socket.on('disconnect', () => {
     console.log('disconnected ' + socket.id);
     counter--;
+    delete whoSeesWhat[socket.id];
     io.clients((error: Error, clients: any[]) => {
       userCount.next(clients.filter(n => n).length);
 
@@ -78,14 +79,11 @@ io.on('connection', function(socket) {
 });
 
 io.of('/admin').on('connection', function(socket) {
-  const sub = userCount.subscribe(count => {
-    socket.emit('usercount', count);
-  });
   const sub1 = currentlyReading.subscribe(reader => {
+    socket.emit('usercount', Object.keys(whoSeesWhat).length);
     socket.emit('reading', whoSeesWhat);
   });
   socket.on('disconnect', () => {
-    sub.unsubscribe();
     sub1.unsubscribe();
   });
 });
