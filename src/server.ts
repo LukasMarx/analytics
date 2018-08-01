@@ -30,12 +30,16 @@ const io = socketIO(httpServer, { path: '/analytics', origins: '*:*', cookie: fa
 
 const userCount = new Subject<number>();
 
+let counter = 0;
 io.on('connection', function(socket) {
+  console.log('connection ' + socket.id);
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     cachedDb.collection('logs').insert(dataset);
   });
   socket.on('connect', () => {
+    console.log('connected ' + socket.id);
+    counter++;
     io.clients((error: Error, clients: any[]) => {
       userCount.next(clients.filter(n => n).length);
 
@@ -46,10 +50,12 @@ io.on('connection', function(socket) {
           c.push(s[key]);
         }
       }
-      console.log(clients.filter(n => n).length, c.length);
+      console.log(clients.filter(n => n).length, c.length, counter);
     });
   });
   socket.on('disconnect', () => {
+    console.log('disconnected ' + socket.id);
+    counter--;
     io.clients((error: Error, clients: any[]) => {
       userCount.next(clients.filter(n => n).length);
 
@@ -60,7 +66,7 @@ io.on('connection', function(socket) {
           c.push(s[key]);
         }
       }
-      console.log(clients.filter(n => n != null).length, c.length);
+      console.log(clients.filter(n => n != null).length, c.length, counter);
       socket.disconnect(true);
     });
   });
