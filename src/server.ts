@@ -45,11 +45,12 @@ io.on('connection', function(socket) {
     const c = [];
     const s = io.of('/').sockets;
     for (const key in s) {
-      if (s[key]) {
+      if (s[key] && s[key].connected) {
         c.push(s[key]);
       }
     }
     console.log(clients.filter(n => n).length, c.length, counter);
+    socket.disconnect(true);
   });
   socket.on('disconnect', () => {
     console.log('disconnected ' + socket.id);
