@@ -36,10 +36,10 @@ io.on('connection', function(socket) {
     cachedDb.collection('logs').insert(dataset);
   });
   socket.on('connect', () => {
-    userCount.next(Object.keys(io.sockets.connected).length);
+    userCount.next(Object.keys(io.nsps['/'].connected).length);
   });
   socket.on('disconnect', () => {
-    userCount.next(Object.keys(io.sockets.connected).length);
+    userCount.next(Object.keys(io.nsps['/'].connected).length);
   });
 });
 
