@@ -26,7 +26,7 @@ mongo.MongoClient.connect(
 const app = express();
 app.use(cors());
 const httpServer = (<any>http).Server(app);
-const io = socketIO(httpServer, { path: '/analytics', origins: '*:*' });
+const io = socketIO(httpServer, { path: '/analytics', origins: '*:*', cookie: false });
 
 const userCount = new Subject<number>();
 
@@ -36,11 +36,14 @@ io.on('connection', function(socket) {
     cachedDb.collection('logs').insert(dataset);
   });
   socket.on('connect', () => {
-    console.log(io.nsps['/'].connected);
-    userCount.next(Object.keys(io.nsps['/'].connected).length);
+    io.clients((error: Error, clients: any[]) => {
+      userCount.next(clients.length);
+    });
   });
   socket.on('disconnect', () => {
-    userCount.next(Object.keys(io.nsps['/'].connected).length);
+    io.clients((error: Error, clients: any[]) => {
+      userCount.next(clients.length);
+    });
   });
 });
 
