@@ -32,26 +32,24 @@ const userCount = new Subject<number>();
 
 let counter = 0;
 io.on('connection', function(socket) {
-  console.log('connection ' + socket.id);
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     cachedDb.collection('logs').insert(dataset);
   });
-  socket.on('connect', () => {
-    console.log('connected ' + socket.id);
-    counter++;
-    io.clients((error: Error, clients: any[]) => {
-      userCount.next(clients.filter(n => n).length);
 
-      const c = [];
-      const s = io.of('/').sockets;
-      for (const key in s) {
-        if (s[key]) {
-          c.push(s[key]);
-        }
+  console.log('connected ' + socket.id);
+  counter++;
+  io.clients((error: Error, clients: any[]) => {
+    userCount.next(clients.filter(n => n).length);
+
+    const c = [];
+    const s = io.of('/').sockets;
+    for (const key in s) {
+      if (s[key]) {
+        c.push(s[key]);
       }
-      console.log(clients.filter(n => n).length, c.length, counter);
-    });
+    }
+    console.log(clients.filter(n => n).length, c.length, counter);
   });
   socket.on('disconnect', () => {
     console.log('disconnected ' + socket.id);
