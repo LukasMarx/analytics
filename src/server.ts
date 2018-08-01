@@ -31,7 +31,7 @@ const io = socketIO(httpServer, { path: '/analytics', origins: '*:*', cookie: fa
 const userCount = new Subject<number>();
 
 io.on('connection', function(socket) {
-  console.log(socket.request.connection.remoteAddress);
+  console.log(socket.conn.transport.socket._socket.remoteAddress);
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     cachedDb.collection('logs').insert(dataset);
