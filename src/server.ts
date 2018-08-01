@@ -32,11 +32,13 @@ const userCount = new Subject<number>();
 
 const sockets: { [key: string]: Socket } = {};
 io.on('connection', function(socket) {
-  sockets[socket.id] = socket;
-  userCount.next(Object.keys(sockets).length);
   socket.on('navigation', msg => {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     cachedDb.collection('logs').insert(dataset);
+  });
+  socket.on('connect', () => {
+    sockets[socket.id] = socket;
+    userCount.next(Object.keys(sockets).length);
   });
   socket.on('disconnect', () => {
     delete sockets[socket.id];
