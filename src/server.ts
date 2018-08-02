@@ -50,6 +50,7 @@ io.on('connection', function(socket) {
     counter--;
     console.log(counter + ' active connections');
     delete whoSeesWhat[socket.id];
+    currentlyReading.next();
     socket.disconnect(true);
   });
   socket.on('error', function(err) {
