@@ -45,6 +45,7 @@ server.on('connection', connection => {
   });
   connection.on('pong', () => ((<any>connection).isAlive = true));
 
+  console.log('coonected ip: ' + (<any>connection).upgradeReq.headers['x-real-ip'] || (<any>connection).upgradeReq.connection.remoteAddress);
   console.log('--- all connected users ---');
   for (const key in userRoom) {
     console.log(userRoom[key].id, userRoom[key].readyState);
