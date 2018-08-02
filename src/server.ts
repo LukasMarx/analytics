@@ -45,7 +45,7 @@ server.on('connection', (connection, req) => {
   });
   connection.on('pong', () => ((<any>connection).isAlive = true));
 
-  console.log('coonected ip: ' + req.headers['x-real-ip'] || JSON.stringify(req.rawHeaders));
+  console.log(JSON.stringify(req.rawHeaders));
   console.log('--- all connected users ---');
   for (const key in userRoom) {
     console.log(userRoom[key].id, userRoom[key].readyState);
