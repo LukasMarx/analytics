@@ -5,23 +5,23 @@ import cors from 'cors';
 import * as mongo from 'mongodb';
 import { Subject } from 'rxjs';
 
-// const uri = process.env.MONGODB;
+const uri = process.env.MONGODB;
 
-// let cachedDb: mongo.Db = undefined;
+let cachedDb: mongo.Db = undefined;
 
-// mongo.MongoClient.connect(
-//   uri,
-//   { poolSize: 10 }
-// )
-//   .then(async client => {
-//     cachedDb = client.db('analytics');
-//     const result = await cachedDb.command({ listCollections: 1 });
-//     try {
-//       cachedDb.createCollection('logs', { capped: true, size: 1073741824 });
-//     } catch (error) {}
-//     cachedDb.collection('logs').createIndex({ projectId: 1 }, { background: true, unique: false });
-//   })
-//   .catch();
+mongo.MongoClient.connect(
+  uri,
+  { poolSize: 10 }
+)
+  .then(async client => {
+    cachedDb = client.db('analytics');
+    const result = await cachedDb.command({ listCollections: 1 });
+    try {
+      cachedDb.createCollection('logs', { capped: true, size: 1073741824 });
+    } catch (error) {}
+    cachedDb.collection('logs').createIndex({ projectId: 1 }, { background: true, unique: false });
+  })
+  .catch();
 
 const app = express();
 app.use(cors());
@@ -38,7 +38,7 @@ io.on('connection', function(socket) {
     const dataset = { projectId: msg.projectId, path: msg.path, timestamp: new Date().getTime() };
     whoSeesWhat[socket.id] = msg.path;
     currentlyReading.next({ path: (<any>msg).path, socketId: socket.id });
-    // cachedDb.collection('logs').insert(dataset);
+    cachedDb.collection('logs').insert(dataset);
   });
 
   console.log('connected ' + socket.id);
@@ -50,11 +50,11 @@ io.on('connection', function(socket) {
     counter--;
     console.log(counter + ' active connections');
     delete whoSeesWhat[socket.id];
-    // socket.disconnect(true);
+    socket.disconnect(true);
   });
   socket.on('error', function(err) {
     console.log('socket error: ' + err);
-    // socket.disconnect(true);
+    socket.disconnect(true);
   });
 });
 
