@@ -30,7 +30,7 @@ const whoSeesWhat: { [key: string]: string } = {};
 const adminRoom: { [key: string]: any } = {};
 const userRoom: { [key: string]: any } = {};
 
-server.on('connection', connection => {
+server.on('connection', (connection, req) => {
   (<any>connection).isAlive = true;
   (<any>connection).id = v4();
   connection.on('message', message => {
@@ -45,7 +45,7 @@ server.on('connection', connection => {
   });
   connection.on('pong', () => ((<any>connection).isAlive = true));
 
-  console.log('coonected ip: ' + (<any>connection).upgradeReq.headers['x-real-ip'] || (<any>connection).upgradeReq.connection.remoteAddress);
+  console.log('coonected ip: ' + req.headers['x-real-ip'] || JSON.stringify(req.rawHeaders));
   console.log('--- all connected users ---');
   for (const key in userRoom) {
     console.log(userRoom[key].id, userRoom[key].readyState);
