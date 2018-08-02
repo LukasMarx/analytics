@@ -21,7 +21,7 @@ import { v4 } from 'uuid';
 //   })
 //   .catch();
 
-const server = new Server({ port: 3000, path: '/analytics' });
+const server = new Server({ port: 3001, path: '/analytics' });
 
 const userCount = new Subject<number>();
 const currentlyReading = new Subject<{ path: string; socketId: string }>();
@@ -44,6 +44,11 @@ server.on('connection', connection => {
     }
   });
   connection.on('pong', () => ((<any>connection).isAlive = true));
+
+  console.log('--- all connected users ---');
+  for (const key in userRoom) {
+    console.log(userRoom[key].id, userRoom[key].readyState);
+  }
 });
 
 function handleMessage(connection: any, msg: any) {
@@ -73,11 +78,14 @@ const interval = setInterval(() => {
     if (c.isAlive === false) {
       delete adminRoom[c.id];
       delete userRoom[c.id];
+      console.log('Connection ' + c.id + ' timed out');
       client.terminate();
       return;
     }
 
     c.isAlive = false;
-    client.ping(() => {});
+    client.ping(null, null, error => {
+      if (error) console.log(error);
+    });
   });
 }, 10000);
