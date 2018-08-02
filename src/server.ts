@@ -70,7 +70,12 @@ function handleMessage(connection: any, msg: any) {
 const interval = setInterval(() => {
   server.clients.forEach(client => {
     const c: any = client;
-    if (c.isAlive === false) return client.terminate();
+    if (c.isAlive === false) {
+      delete adminRoom[c.id];
+      delete userRoom[c.id];
+      client.terminate();
+      return;
+    }
 
     c.isAlive = false;
     client.ping(() => {});
