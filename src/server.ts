@@ -21,7 +21,7 @@ import { v4 } from 'uuid';
 //   })
 //   .catch();
 
-const server = new Server({ port: 3001, path: '/analytics' });
+const server = new Server({ port: 3000, path: '/analytics' });
 
 const userCount = new Subject<number>();
 const currentlyReading = new Subject<{ path: string; socketId: string }>();
